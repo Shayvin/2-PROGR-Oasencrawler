@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_1/cmake-build-debug"
+			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_PROZD/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -479,7 +479,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_1/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_PROZD/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_1"
+			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_PROZD"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -1111,7 +1111,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_1/cmake-build-debug"
+			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_PROZD/cmake-build-debug"
 		},
 		{
 			"name" : "Oasencrawler_1_IS_TOP_LEVEL",
@@ -1135,7 +1135,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_1"
+			"value" : "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_PROZD"
 		}
 	],
 	"kind" : "cache",

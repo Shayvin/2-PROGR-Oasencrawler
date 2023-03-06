@@ -1,4 +1,4 @@
-# Install script for directory: /Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_1
+# Install script for directory: /Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_PROZD
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_1/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/leitner/Library/CloudStorage/OneDrive-FHTechnikumWien/SS2023/Objektorientierte Programmierung Labor/C++/Oasencrawler_PROZD/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
