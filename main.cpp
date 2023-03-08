@@ -1,65 +1,17 @@
 #include <iostream>
 #include <cstdlib>
 #include <time.h>
+#include "head/main.h"
 using namespace std;
-
-
-enum fieldType {
-    empt = 0, danger = 1, fountain = 2, relique = 3
-};
-
-class stats {
-    public:
-        int vanish = 0;
-        int lpboost = 0;
-        int shield = 0;
-};
-
-class field {
-    public:
-        fieldType type;
-        bool visited = false;
-};
-
-
-class player {
-    public:
-        int lp = 5; // Life-Points
-        int rp = 0; // Relique-Points
-        int x = 0;
-        int y = 0;
-        int healed = 0;
-        int dmg = 0;
-};
-
-
-class enemy {
-    public:
-        int x = 4;
-        int y = 4;
-};
-
-
-class world {
-    public:
-        field play[5][5];
-        player player1;
-        enemy enemy1;
-        enemy enemy2;
-        int relique_count = 0;
-        int level = 1;
-        int rp_collected = 0;
-        stats attribute;
-};
-
 
 void generateWorld(world &newWorld) {
     srand(time(0)); // Nimmt aktuelle Zeit als Seed. Braucht man, sonst kommt immer der selbe Seed heraus.
     int relique_x = rand() % 5;
     int relique_y = rand() % 5;
+    int _rc = newWorld.getRc();
     newWorld.play[relique_x][relique_y].type = relique;
     newWorld.play[relique_x][relique_y].visited = false;
-    newWorld.relique_count++;
+    newWorld.setRc(_rc + 1);
     for(int x = 0; x < 5; x++) {
         for(int y = 0; y < 5; y++) {
             if(x == relique_x && y == relique_y) {
@@ -73,15 +25,13 @@ void generateWorld(world &newWorld) {
             else if(rng < 7) {
                 newWorld.play[x][y].type = danger;
             }
-            else if(newWorld.level == 1) {
-                if(rng < 8) {
-                    newWorld.play[x][y].type = fountain;
-                }
+            else if(rng < 8) {
+                newWorld.play[x][y].type = fountain;
             }
-
             else if(rng < 9) {
                 newWorld.play[x][y].type = relique;
-                newWorld.relique_count++;
+                ++_rc;
+                newWorld.setRc(_rc + 1);
             } else {
                 newWorld.play[x][y].type= empt;
             }
@@ -90,82 +40,146 @@ void generateWorld(world &newWorld) {
     }
 }
 
+int fieldTest() {
+    int rng = 3;
+    int input;
 
-void fieldEvaluate(world &newWorld, int new_x, int new_y) {
-
-    if (newWorld.play[new_x][new_y].type == empt) {
-        int rng = rand() % 10;
-        if(rng == 1) {
-            newWorld.attribute.lpboost++;
-            cout << "Du bekommst 1 LP-Trank" << endl;
+    while(true) {
+        cout << "Rate eine Zahl zwischen 1-5, wenn du richtig liegst hast du bestanden!" << endl;
+        cin >> input;
+        if(input < 1 || input > 4) {
+            cout << "Falscher Input, Pech gehabt" << endl;
+            break;
         }
-        else if(rng == 2) {
-            newWorld.attribute.vanish++;
-            cout << "Du bekommst 1 Unsichtbarkeitstrank" << endl;
+        if(rng == input) {
+            return 1;
         }
-        else if(rng == 3) {
-            newWorld.attribute.shield++;
-            cout << "Du bekommst 1 Schild" << endl;
-        }
+        break;
     }
-    if (newWorld.play[new_x][new_y].type == fountain) {
-        {
-            if(newWorld.attribute.lpboost > 0) {
-                newWorld.player1.lp++;
-                cout << "Du bekommst 1 zusätzlichen LP, dank deines LP-Tranks" << endl;
-                newWorld.attribute.lpboost--;
-                cout << "Anzahl LP-Tränke: " << newWorld.attribute.lpboost <<  endl;
-            }
-            newWorld.player1.lp++;
-            newWorld.player1.healed++;
-            cout << "Du bekommst 1 LP" << endl;
-            cout << "LP: " << newWorld.player1.lp << endl;
+    return 0;
+}
+
+void attributeLPBoost(world &newWorld) {
+    double newLP = newWorld.player1.getLP();
+        if (newWorld.attribute.getLPBoost() == 0) {
+            newWorld.player1.setLP(newLP + 1);
         }
+        if (newWorld.attribute.getLPBoost() == 1) {
+            newWorld.player1.setLP(newLP + 1.25);
+        }
+        else if (newWorld.attribute.getLPBoost() == 2) {
+            newWorld.player1.setLP(newLP + 1.5);
+        }
+        else if (newWorld.attribute.getLPBoost() == 3) {
+            newWorld.player1.setLP(newLP + 1.75);
+        }
+        else if (newWorld.attribute.getLPBoost() == 4) {
+            newWorld.player1.setLP(newLP + 2);
+        }
+}
+
+void attributeShield(world &newWorld) {
+    double newLP = newWorld.player1.getLP();
+
+    if (newWorld.attribute.getShield() == 0) {
+        newWorld.player1.setLP(newLP + 0.1);
     }
-
-
-    if (newWorld.play[new_x][new_y].type == danger) {
-        {
-            int rng = rand() % 6 + 1;
-            if(rng < 5) {
-                if(newWorld.attribute.vanish > 0) {
-                    cout << "Du benutzt deinen Unsichtbarkeitstrank und verlierst kein Leben" << endl;
-                    newWorld.attribute.vanish--;
-                    cout << "Anzahl Unsichtbarkeits-Tränke: " << newWorld.attribute.vanish <<  endl;
-                } else {
-                    newWorld.player1.lp--;
-                    newWorld.player1.dmg++;
-                    cout << "Du verlierst 1 LP" << endl;
-                    cout << "LP: " << newWorld.player1.lp << endl;
-                }
-            } else {
-                cout << "Glück gehabt! Du verlierst kein LP" << endl;
-            }
-        }
+    if (newWorld.attribute.getShield() == 1) {
+        newWorld.player1.setLP(newLP + 0.2);
     }
-
-
-    if (newWorld.play[new_x][new_y].type == relique) {
-        {
-            newWorld.player1.rp++;
-            newWorld.rp_collected++;
-            cout << "Du bekommst 1 RP" << endl;
-            cout << "RP: " << newWorld.player1.rp << endl;
-        }
+    else if (newWorld.attribute.getShield() == 2) {
+        newWorld.player1.setLP(newLP + 0.3);
+    }
+    else if (newWorld.attribute.getShield() == 3) {
+        newWorld.player1.setLP(newLP + 0.4);
+    }
+    else if (newWorld.attribute.getShield() == 4) {
+        newWorld.player1.setLP(newLP + 0.5);
     }
 }
 
+void attributeResistance(world &newWorld) {
+    double newLP = newWorld.player1.getLP();
+
+    if (newWorld.attribute.getResistance() == 1) {
+        newWorld.player1.setLP(newLP + 0.2);
+    }
+    else if (newWorld.attribute.getResistance() == 2) {
+        newWorld.player1.setLP(newLP + 0.3);
+    }
+    else if (newWorld.attribute.getResistance() == 3) {
+        newWorld.player1.setLP(newLP + 0.4);
+    }
+    else if (newWorld.attribute.getResistance() == 4) {
+        newWorld.player1.setLP(newLP + 0.5);
+    }
+}
+
+void fieldEvaluate(world &newWorld, int new_x, int new_y) {
+    double _lp = newWorld.player1.getLP();
+    int _rc = newWorld.getRc();
+    int _rp = newWorld.player1.getRP();
+    int _dmg = newWorld.player1.getDmg();
+    int _healed = newWorld.player1.getHealed();
+    double _lpboost = newWorld.attribute.getLPBoost();
+    double _shield = newWorld.attribute.getShield();
+    double _resistance = newWorld.attribute.getResistance();
+
+    if (newWorld.play[new_x][new_y].type == fountain) {
+        {
+            if (fieldTest()) {
+                newWorld.attribute.setLPBoost(_lpboost + 1);
+            }
+
+            attributeLPBoost(newWorld);
+            cout << "LP-Boost Attribute: " << newWorld.attribute.getLPBoost() << endl;
+            newWorld.player1.setHealed(_healed + 1);
+            cout << "Du bekommst 1 LP" << endl;
+            cout << "LP: " << newWorld.player1.getLP() << endl;
+            cout << "--------------------------------" << endl;
+        }
+    }
+
+    if (newWorld.play[new_x][new_y].type == danger) {
+        {
+            if (fieldTest()) {
+                newWorld.attribute.setShield(_shield + 1);
+            }  else {
+                newWorld.player1.setLP(_lp - 1);
+                newWorld.player1.setDmg(_dmg -1);
+                cout << "Du bekommst Schaden vom Gegner!" << endl;
+            }
+            attributeShield(newWorld);
+            cout << "LP-Boost Attribute: " << newWorld.attribute.getShield() << endl;
+            newWorld.player1.setHealed(_healed + 1);
+            cout << "LP: " << newWorld.player1.getLP() << endl;
+            cout << "--------------------------------" << endl;
+        }
+    }
+
+    if (newWorld.play[new_x][new_y].type == relique) {
+        {
+            if (fieldTest()) {
+                newWorld.attribute.setResistance(_resistance + 1);
+            }
+            newWorld.player1.setRP(_rp + 1);
+            newWorld.rp_collected++;
+            cout << "Du bekommst 1 RP" << endl;
+            cout << "RP: " << newWorld.player1.getRP() << endl;
+        }
+    }
+}
 
 void setupEnemy(world &newWorld) {
     int enemy_x = rand() % 5;
     int enemy_y = rand() % 5;
 
     if(enemy_x != 0 && enemy_y != 0) {
-        newWorld.enemy1.x = enemy_x;
-        newWorld.enemy1.y = enemy_y;
+        newWorld.enemy1.setX(enemy_x);
+        newWorld.enemy1.setY(enemy_y);
     } else {
-        newWorld.enemy1.x = 3;
-        newWorld.enemy1.y = 3;
+        newWorld.enemy1.setX(3);
+        newWorld.enemy1.setY(3);
     }
 }
 
@@ -173,42 +187,44 @@ void setupEnemy2(world &newWorld) {
     int enemy2_x = rand() % 5;
     int enemy2_y = rand() % 5;
     if(enemy2_x != 0 && enemy2_y != 0) {
-        newWorld.enemy2.x = enemy2_x;
-        newWorld.enemy2.y = enemy2_y;
+        newWorld.enemy2.setX(enemy2_x);
+        newWorld.enemy2.setY(enemy2_y);
     } else {
-        newWorld.enemy2.x = 2;
-        newWorld.enemy2.y = 2;
+        newWorld.enemy2.setX(2);
+        newWorld.enemy2.setY(2);
     }
 }
 
-
 void movementEnemy(world &newWorld) {
-    if(newWorld.enemy1.x < newWorld.player1.x) {
-        newWorld.enemy1.x++;
-        if(newWorld.enemy1.x == 4) {
-            newWorld.enemy1.x = 4;
+    int _x = newWorld.enemy1.getX();
+    int _y = newWorld.enemy1.getY();
+
+    if(newWorld.enemy1.getX() < newWorld.player1.getX()) {
+        newWorld.enemy1.setX(_x + 1);
+        if(newWorld.enemy1.getX() == 4) {
+            newWorld.enemy1.setX(4);
         }
     }
 
-    if(newWorld.enemy1.x > newWorld.player1.x) {
-        newWorld.enemy1.x--;
-        if(newWorld.enemy1.x == 0) {
-            newWorld.enemy1.x = 0;
+    if(newWorld.enemy1.getX() > newWorld.player1.getX()) {
+        newWorld.enemy1.setX(_x - 1);
+        if(newWorld.enemy1.getX() == 0) {
+            newWorld.enemy1.setX(0);
         }
     }
 
 
-    if(newWorld.enemy1.y < newWorld.player1.y) {
-        newWorld.enemy1.y++;
-        if(newWorld.enemy1.y == 4) {
-            newWorld.enemy1.y = 4;
+    if(newWorld.enemy1.getY() < newWorld.player1.getY()) {
+        newWorld.enemy1.setY(_y + 1);
+        if(newWorld.enemy1.getY() == 4) {
+            newWorld.enemy1.setY(4);
         }
     }
 
-    if(newWorld.enemy1.y > newWorld.player1.y) {
-        newWorld.enemy1.y--;
-        if(newWorld.enemy1.y == 0) {
-            newWorld.enemy1.y = 0;
+    if(newWorld.enemy1.getY() > newWorld.player1.getY()) {
+        newWorld.enemy1.setY(_y - 1);
+        if(newWorld.enemy1.getY() == 0) {
+            newWorld.enemy1.setY(0);
         }
     }
 }
@@ -217,10 +233,30 @@ void movementEnemy2(world &newWorld) {
     int enemy2_x = rand() % 5;
     int enemy2_y = rand() % 5;
 
-    newWorld.enemy2.x = enemy2_x;
-    newWorld.enemy2.y = enemy2_y;
+    newWorld.enemy2.setX(enemy2_x);
+    newWorld.enemy2.setY(enemy2_y);
 }
 
+void enemyAttack(world &newWorld, int new_x, int new_y) {
+    int rng = rand() % 5;
+    int _lp = newWorld.player1.getLP();
+    int _dmg = newWorld.player1.getDmg();
+
+    if(newWorld.enemy1.getX() == new_x && newWorld.enemy1.getY() == new_y) {
+        attributeResistance(newWorld);
+        newWorld.player1.setDmg(_dmg + 1);
+        newWorld.player1.setLP(_lp - 1);
+        cout << "Der Gegner hat dich mit einem Pfeil getroffen!" << endl;
+        cout << "" << newWorld.player1.getLP() << endl;
+    }
+    if(rng == 3) {
+        attributeResistance(newWorld);
+        newWorld.player1.setDmg(_dmg + 1);
+        newWorld.player1.setLP(_lp - 1);
+        cout << "Der Gegner hat dich mit einem Pfeil getroffen!" << endl;
+        cout << "Leben gesamt: " << newWorld.player1.getLP() << endl;
+    }
+}
 
 void displayWorld(world &newWorld) {
     int empt = 0;
@@ -248,15 +284,15 @@ void displayWorld(world &newWorld) {
                 }
             }
 
-            if (newWorld.player1.x == x && newWorld.player1.y == y) {
+            if (newWorld.player1.getX() == x && newWorld.player1.getY() == y) {
                 type = player;
             }
 
-            if (newWorld.enemy1.x == x && newWorld.enemy1.y == y) {
+            if (newWorld.enemy1.getX() == x && newWorld.enemy1.getY() == y) {
                 type = enemy;
             }
-            if(newWorld.level == 3) {
-                if (newWorld.enemy2.x == x && newWorld.enemy2.y == y) {
+            if(newWorld.getLvl() == 3) {
+                if (newWorld.enemy2.getX() == x && newWorld.enemy2.getY() == y) {
                     type = enemy;
                 }
             }
@@ -266,48 +302,46 @@ void displayWorld(world &newWorld) {
     }
 }
 
-
 void showStats(world &newWorld) {
-    if(newWorld.player1.rp == newWorld.relique_count) {
         cout << "--------------------------------" << endl;
         cout << "Statistik:" << endl;
         cout << "--------------------------------" << endl;
         cout << "Relikte gefunden: " << newWorld.rp_collected << endl;
-        cout << "Leben gesamt: " << newWorld.player1.lp << endl;
-        cout << "Leben verloren: " << newWorld.player1.dmg << endl;
-        cout << "Leben bekommen: " << newWorld.player1.healed << endl;
+        cout << "Leben gesamt: " << newWorld.player1.getLP() << endl;
+        cout << "Leben verloren: " << newWorld.player1.getDmg() << endl;
+        cout << "Leben bekommen: " << newWorld.player1.getHealed() << endl;
         cout << "--------------------------------" << endl;
-    }
 }
 
 void levelUp(world &newWorld) {
-    newWorld.level++;
-    if(newWorld.level < 4) {
-        if(newWorld.level == 3) {
+    int _level = newWorld.getLvl();
+    newWorld.setLvl(_level + 1);
+    if(newWorld.getLvl() < 4) {
+        if(newWorld.getLvl() == 3) {
             setupEnemy2(newWorld);
         }
         generateWorld(newWorld);
-        newWorld.player1.lp = 5;
-        newWorld.player1.rp = 0;
+        newWorld.player1.setLP(5);
+        newWorld.player1.setRP(0);
         cout << "--------------------------------" << endl;
-        cout << "LEVEL " << newWorld.level << endl;
+        cout << "LEVEL " << newWorld.getLvl() << endl;
         cout << "--------------------------------" << endl;
-        cout << "Relikte Gesamt: " << newWorld.relique_count << endl;
-        cout << "Leben Gesamt: " << newWorld.player1.lp << endl;
+        cout << "Relikte Gesamt: " << newWorld.getRc() << endl;
+        cout << "Leben Gesamt: " << newWorld.player1.getLP() << endl;
         cout << "--------------------------------" << endl;
     }
 }
 
 void movementWorld(world &newWorld) {
-    int new_x = newWorld.player1.x;
-    int new_y = newWorld.player1.y;
+    int new_x = newWorld.player1.getX();
+    int new_y = newWorld.player1.getY();
     char input;
     cout << "--------------------------------" << endl;
-    cout << "Relikte Gesamt: " << newWorld.relique_count << endl;
-    cout << "Leben Gesamt: " << newWorld.player1.lp << endl;
+    cout << "Relikte Gesamt: " << newWorld.getRc() << endl;
+    cout << "Leben Gesamt: " << newWorld.player1.getLP() << endl;
     cout << "--------------------------------" << endl;
 
-    while(newWorld.player1.lp != 0) {
+    while(newWorld.player1.getLP() > 0) {
         displayWorld(newWorld);
         cout << "Welche Richtung? (w, a, s, d)" << endl;
         cin >> input;
@@ -327,7 +361,6 @@ void movementWorld(world &newWorld) {
             }
         }
 
-
         else if(input == 'a') {
             if(new_y > 0 && new_y <= 4) {
                 new_y--;
@@ -342,7 +375,6 @@ void movementWorld(world &newWorld) {
                 newWorld.play[new_x][new_y].visited = true;
             }
         }
-
 
         else if(input == 'w') {
             if(new_x > 0 && new_x <= 4) {
@@ -376,40 +408,27 @@ void movementWorld(world &newWorld) {
         }
 
         movementEnemy(newWorld);
-        if(newWorld.level == 3) {
+        if(newWorld.getLvl() == 3) {
             movementEnemy2(newWorld);
         }
-        newWorld.player1.x = new_x;
-        newWorld.player1.y = new_y;
+        newWorld.player1.setX(new_x);
+        newWorld.player1.setY(new_y);
 
+        enemyAttack(newWorld, new_x, new_y);
 
-        if(newWorld.enemy1.x == new_x && newWorld.enemy1.y == new_y) {
-
-            if(newWorld.attribute.shield > 0) {
-                newWorld.attribute.shield--;
-                cout << "Dein Schild hat dich beschützt, du bekommst kein Schaden." << endl;
-            } else {
-                newWorld.player1.lp--;
-                cout << "Der Gegner fügt dir 1 Schaden zu!" << endl;
-                cout << "Leben gesamt: " << newWorld.player1.lp << endl;
-            }
-        }
-
-        if(newWorld.player1.rp == newWorld.relique_count) {
-            showStats(newWorld);
-            newWorld.relique_count = 0;
+        if(newWorld.player1.getRP() == newWorld.getRc()) {
+            newWorld.setRc(0);
             levelUp(newWorld);
         }
-        if(newWorld.level == 4) {
-            showStats(newWorld);
-            cout << "Game durchgespielt!";
+        if(newWorld.getLvl() == 4) {
+            cout << "Game durchgespielt!" << endl;
             break;
         }
     }
+    if(newWorld.player1.getLP() <= 0) {
+        cout << "Du hast kein Leben mehr!";
+    }
 }
-
-
-
 
 void displayRules(world &newWorld) {
     char input = 0;
@@ -448,4 +467,5 @@ int main() {
     displayRules(newWorld);
     generateWorld(newWorld);
     movementWorld(newWorld);
+    showStats(newWorld);
 }
