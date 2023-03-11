@@ -332,6 +332,18 @@ void levelUp(world &newWorld) {
     }
 }
 
+int checkInput(char input) {
+    while(true) {
+        if(input == 'w' || input == 'a' || input == 's' || input == 'd') {
+            return 0;
+        }
+        else {
+            cout << "Falsche Eingabe!" << endl;
+            cin >> input;
+        }
+    }
+}
+
 void movementWorld(world &newWorld) {
     int new_x = newWorld.player1.getX();
     int new_y = newWorld.player1.getY();
@@ -345,7 +357,7 @@ void movementWorld(world &newWorld) {
         displayWorld(newWorld);
         cout << "Welche Richtung? (w, a, s, d)" << endl;
         cin >> input;
-
+        checkInput(input);
         if(input == 's') {
             if(new_x >= 0 && new_x < 4) {
                 new_x++;
